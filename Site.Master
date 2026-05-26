@@ -1,0 +1,420 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" 
+    CodeBehind="Site.Master.cs" Inherits="CamAlert.Site" %>
+<!DOCTYPE html>
+<html lang="fr">
+<head runat="server">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CAM-ALERT – Portail camerounais</title>
+
+    <link rel="stylesheet" type="text/css" href="/Content/css/style.css" />
+    <link rel="stylesheet" type="text/css" href="/Content/css/design.css" />
+    <link rel="stylesheet" type="text/css" href="/Content/css/dark-mode.css" />
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Leaflet MarkerCluster -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
+    <asp:ContentPlaceHolder ID="HeadContent" runat="server" />
+
+    <style>
+        /* Styles pour la recherche dans la navbar */
+        .search-icon-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background 0.2s;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            margin-right: 4px;
+        }
+        .search-icon-btn:hover {
+            background: rgba(255,255,255,0.15);
+        }
+        .search-dropdown {
+            display: none;
+            position: absolute;
+            top: 64px;
+            right: 80px;
+            width: 350px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.2);
+            z-index: 1001;
+            overflow: hidden;
+        }
+        .search-dropdown.open {
+            display: block;
+            animation: fadeInUp 0.2s ease;
+        }
+        .search-dropdown-inner {
+            padding: 15px;
+        }
+        .search-dropdown-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e4e8;
+            border-radius: 40px;
+            font-size: 14px;
+            transition: all 0.2s;
+            outline: none;
+        }
+        .search-dropdown-input:focus {
+            border-color: #003f7d;
+            box-shadow: 0 0 0 3px rgba(0,63,125,0.1);
+        }
+        .global-suggestions-box {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 10px;
+            display: none;
+        }
+        .global-suggestions-box.active {
+            display: block;
+        }
+        .global-suggestion-item {
+            padding: 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f2f7;
+            transition: background 0.15s;
+        }
+        .global-suggestion-item:hover {
+            background: #f4f6fb;
+        }
+        .global-suggestion-item strong {
+            display: block;
+            font-size: 14px;
+            color: #1a2235;
+            margin-bottom: 5px;
+        }
+        .suggestion-badge {
+            display: inline-block;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-right: 8px;
+        }
+        .suggestion-badge.disparition {
+            background: #fff0e6;
+            color: #e8600a;
+        }
+        .suggestion-badge.recherche {
+            background: #e8f0fe;
+            color: #003f7d;
+        }
+        .suggestion-detail {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+        @media (max-width: 768px) {
+            .search-dropdown {
+                top: 56px;
+                right: 10px;
+                left: 10px;
+                width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <form id="form1" runat="server">
+
+        <!-- NAVBAR UNIQUE -->
+        <nav class="navbar">
+            <a href="/Default.aspx" class="navbar-brand">CAM-<span>ALERT</span></a>
+
+            <div class="nav-main-links">
+                <a href="/Dossiers.aspx">Personnes recherchées</a>
+                <a href="/Dossiers.aspx?type=1">Personnes disparues</a>
+                <a href="/Signalement.aspx">Soumettre une information</a>
+                <% if (IsAdmin) { %>
+                    <a href="/Carte.aspx">🗺️ Carte interactive</a>
+                <% } %>
+                <a href="/Admin/Login.aspx" class="nav-admin">Espace administration</a>
+            </div>
+
+            <!-- Icône recherche (toujours visible) -->
+            <button class="search-icon-btn" id="searchIconBtn" type="button" aria-label="Rechercher">🔍</button>
+
+            <button class="burger" id="burgerBtn" type="button" aria-label="Menu">
+                <span></span><span></span><span></span>
+            </button>
+
+            <!-- Champ de recherche déroulant -->
+            <div id="searchDropdown" class="search-dropdown">
+                <div class="search-dropdown-inner">
+                    <input type="text" id="globalSearchInput" class="search-dropdown-input" 
+                           placeholder="Rechercher une personne disparue ou recherchée..." autocomplete="off">
+                    <div id="globalSuggestionsBox" class="global-suggestions-box"></div>
+                </div>
+            </div>
+
+            <ul class="burger-menu" id="burgerMenu">
+                <li class="desktop-only"><a href="/Historique.aspx">📋 Historique</a></li>
+                <li class="desktop-only"><a href="/APropos.aspx">ℹ️ À propos</a></li>
+                <li class="mobile-only"><a href="/Default.aspx">🏠 Accueil</a></li>
+                <li class="mobile-only"><a href="/APropos.aspx">ℹ️ À propos</a></li>
+                <li class="mobile-only"><a href="/Dossiers.aspx">🔍 Personnes recherchées</a></li>
+                <li class="mobile-only"><a href="/Dossiers.aspx?type=1">⚠️ Personnes disparues</a></li>
+                <li class="mobile-only"><a href="/Signalement.aspx">📢 Soumettre une information</a></li>
+                <% if (IsAdmin) { %>
+                    <li class="mobile-only"><a href="/Carte.aspx">🗺️ Carte interactive</a></li>
+                <% } %>
+                <li class="mobile-only"><a href="/Admin/Login.aspx">🔐 Espace administration</a></li>
+                <li><a href="/Contact.aspx">✉️ Contactez-nous</a></li>
+                <li class="dark-mode-item" id="darkModeToggleLi">
+                    <a href="#" id="darkModeToggle" class="dark-mode-link">🌙 Mode sombre</a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- CONTENU PRINCIPAL -->
+        <main class="main-content">
+            <div class="container">
+                <asp:ContentPlaceHolder ID="MainContent" runat="server" />
+            </div>
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+            <div class="container footer-inner">
+                <div class="footer-col">
+                    <strong>CAM-ALERT</strong>
+                    <p>Portail camerounais de signalement des personnes disparues et recherchées.</p>
+                </div>
+                <div class="footer-col">
+                    <strong>Navigation</strong>
+                    <a href="/Default.aspx">Accueil</a>
+                    <a href="/Dossiers.aspx">Dossiers</a>
+                    <a href="/Signalement.aspx">Signalement</a>
+                    <a href="/Contact.aspx">✉️ Contactez-nous</a>
+                </div>
+                <div class="footer-col">
+                    <strong>Mentions légales</strong>
+                    <p>Ce portail est entièrement fictif.<br />Réalisé à des fins pédagogiques – TIPAM2.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="container">
+                    © 2025 CAM-ALERT
+                </div>
+            </div>
+        </footer>
+
+    </form>
+
+    <script>
+        // ========== BURGER MENU ==========
+        document.addEventListener('DOMContentLoaded', function () {
+            var burger = document.getElementById('burgerBtn');
+            var burgerMenu = document.getElementById('burgerMenu');
+
+            if (burger && burgerMenu) {
+                burger.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    burgerMenu.classList.toggle('open');
+                });
+
+                document.addEventListener('click', function (e) {
+                    if (!burger.contains(e.target) && !burgerMenu.contains(e.target)) {
+                        burgerMenu.classList.remove('open');
+                    }
+                });
+
+                document.addEventListener('keydown', function (e) {
+                    if (e.key === 'Escape' && burgerMenu.classList.contains('open')) {
+                        burgerMenu.classList.remove('open');
+                    }
+                });
+
+                var links = burgerMenu.querySelectorAll('a');
+                links.forEach(function (link) {
+                    link.addEventListener('click', function () {
+                        burgerMenu.classList.remove('open');
+                    });
+                });
+            }
+        });
+
+        // ========== DARK MODE ==========
+        (function () {
+            const DARK_MODE_KEY = 'camalert-dark-mode';
+
+            function getDarkModePreference() {
+                const saved = localStorage.getItem(DARK_MODE_KEY);
+                if (saved !== null) {
+                    return saved === 'true';
+                }
+                return window.matchMedia('(prefers-color-scheme: dark)').matches;
+            }
+
+            function setDarkMode(enabled) {
+                const toggleLink = document.getElementById('darkModeToggle');
+                if (enabled) {
+                    document.body.classList.add('dark-mode');
+                    if (toggleLink) toggleLink.innerHTML = '☀️ Mode clair';
+                } else {
+                    document.body.classList.remove('dark-mode');
+                    if (toggleLink) toggleLink.innerHTML = '🌙 Mode sombre';
+                }
+                localStorage.setItem(DARK_MODE_KEY, enabled);
+            }
+
+            function initDarkMode() {
+                const enabled = getDarkModePreference();
+                setDarkMode(enabled);
+
+                const toggleLink = document.getElementById('darkModeToggle');
+                if (toggleLink) {
+                    toggleLink.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        const isDark = document.body.classList.contains('dark-mode');
+                        setDarkMode(!isDark);
+
+                        const burgerMenu = document.getElementById('burgerMenu');
+                        if (burgerMenu) {
+                            burgerMenu.classList.remove('open');
+                        }
+                    });
+                }
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initDarkMode);
+            } else {
+                initDarkMode();
+            }
+        })();
+
+        // ========== RECHERCHE GLOBALE (LOUPE) ==========
+        (function () {
+            const searchIcon = document.getElementById('searchIconBtn');
+            const searchDropdown = document.getElementById('searchDropdown');
+            const searchInput = document.getElementById('globalSearchInput');
+            const suggestionsBox = document.getElementById('globalSuggestionsBox');
+            let searchTimeout;
+
+            if (searchIcon && searchDropdown) {
+                searchIcon.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    searchDropdown.classList.toggle('open');
+                    if (searchDropdown.classList.contains('open')) {
+                        setTimeout(function () { searchInput.focus(); }, 100);
+                    }
+                });
+
+                document.addEventListener('click', function (e) {
+                    if (!searchIcon.contains(e.target) && !searchDropdown.contains(e.target)) {
+                        searchDropdown.classList.remove('open');
+                        suggestionsBox.classList.remove('active');
+                    }
+                });
+
+                if (searchInput) {
+                    searchInput.addEventListener('input', function () {
+                        const term = searchInput.value.trim();
+                        clearTimeout(searchTimeout);
+                        if (term.length < 2) {
+                            suggestionsBox.classList.remove('active');
+                            suggestionsBox.innerHTML = '';
+                            return;
+                        }
+                        searchTimeout = setTimeout(function () {
+                            loadGlobalSuggestions(term);
+                        }, 300);
+                    });
+
+                    // Recherche au clic sur "Entrée"
+                    searchInput.addEventListener('keypress', function (e) {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            const term = searchInput.value.trim();
+                            if (term.length >= 2) {
+                                window.location.href = `/Dossiers.aspx?search=${encodeURIComponent(term)}`;
+                            }
+                        }
+                    });
+                }
+            }
+
+            function loadGlobalSuggestions(term) {
+                fetch('/Default.aspx/SearchAllDossiers', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ searchTerm: term })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        let suggestions = [];
+                        // Gestion des différents formats de réponse
+                        if (data.d) {
+                            if (data.d.Table) {
+                                suggestions = data.d.Table;
+                            } else if (Array.isArray(data.d)) {
+                                suggestions = data.d;
+                            } else if (typeof data.d === 'object') {
+                                suggestions = [data.d];
+                            }
+                        } else if (Array.isArray(data)) {
+                            suggestions = data;
+                        }
+
+                        console.log('Suggestions reçues:', suggestions); // Pour déboguer
+
+                        suggestionsBox.innerHTML = '';
+                        if (suggestions.length > 0) {
+                            suggestions.forEach(s => {
+                                const item = document.createElement('div');
+                                item.className = 'global-suggestion-item';
+                                const typeClass = s.TypeLibelle === 'Disparition' ? 'disparition' : 'recherche';
+                                const typeLabel = s.TypeLibelle === 'Disparition' ? '⚠️ Disparition' : '🔍 Recherche';
+                                item.innerHTML = `<strong>${escapeHtml(s.Titre)}</strong>
+                                  <span class="suggestion-badge ${typeClass}">${typeLabel}</span>
+                                  <div class="suggestion-detail">${escapeHtml(s.Ville)} · ${s.Annee}</div>`;
+                                // Récupération de l'ID du dossier
+                                const dossierId = s.DossierID;
+                                if (dossierId) {
+                                    item.addEventListener('click', function (e) {
+                                        e.preventDefault();
+                                        window.location.href = `/DossierDetail.aspx?id=${dossierId}`;
+                                    });
+                                } else {
+                                    console.warn('DossierID manquant pour', s);
+                                }
+                                suggestionsBox.appendChild(item);
+                            });
+                            suggestionsBox.classList.add('active');
+                        } else {
+                            suggestionsBox.classList.remove('active');
+                        }
+                    })
+                    .catch(err => console.error('Erreur recherche:', err));
+            }
+
+            function escapeHtml(str) {
+                if (!str) return '';
+                return str.replace(/[&<>]/g, function (m) {
+                    if (m === '&') return '&amp;';
+                    if (m === '<') return '&lt;';
+                    if (m === '>') return '&gt;';
+                    return m;
+                });
+            }
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+﻿/* ========== DARK MODE STYLES ========== */
+body.dark-mode {
+    background: #1a1a2e;
+    color: #eee;
+}
+
+    body.dark-mode .navbar {
+        background: linear-gradient(135deg, #0a1628 0%, #060c17 100%);
+    }
+
+    body.dark-mode .card,
+    body.dark-mode .page-header {
+        background: #16213e;
+        color: #eee;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    }
+
+    body.dark-mode .btn-outline {
+        color: #eee;
+        border-color: #eee;
+    }
+
+    body.dark-mode .legal-banner {
+        background: #2c2c3e;
+        color: #ffd966;
+        border-left-color: #ffaa00;
+    }
+
+    body.dark-mode .footer {
+        background: #0a0f1a;
+    }
+
+    body.dark-mode .burger-menu {
+        background: #16213e;
+    }
+
+        body.dark-mode .burger-menu li a {
+            color: #eee;
+            border-bottom-color: #2a2a4e;
+        }
+
+            body.dark-mode .burger-menu li a:hover {
+                background: #1e2a4a;
+                color: #e8600a;
+            }
