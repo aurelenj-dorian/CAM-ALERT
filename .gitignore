@@ -416,3 +416,17 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# Journaux applicatifs ecrits a l execution par Helpers/Journal.cs
+App_Data/Logs/
+*.log
+
+# Fichiers deposes par les utilisateurs : contenu de production, pas du code
+Uploads/*
+!Uploads/.gitkeep
+
+# Photos deposees via le formulaire d'administration.
+# Les fichiers prefixes d'un horodatage (DateTime.Ticks) sont des uploads
+# d'execution, pas des ressources du projet.
+Admin/image/6*_*.jpg
+Admin/image/6*_*.png

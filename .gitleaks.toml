@@ -1,0 +1,29 @@
+# Configuration gitleaks — CAM-ALERT
+# Le dépôt est public : la recherche de secrets tourne en intégration continue.
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Faux positifs connus"
+
+paths = [
+  # Dossier des paquets NuGet restaurés
+  '''packages/.*''',
+]
+
+regexes = [
+  # Hash PBKDF2 du compte de démonstration dans le script de seed.
+  # Ce n'est pas un secret : c'est l'empreinte salée du mot de passe initial
+  # CamAlert@2026, que le compte doit changer à sa première connexion.
+  '''pbkdf2\$sha256\$[0-9]+\$[A-Za-z0-9+/=]+\$[A-Za-z0-9+/=]+''',
+
+  # Valeurs divulguées listées volontairement dans Parametres.cs et
+  # SECURITY.md pour que l'application refuse de les utiliser et que la
+  # procédure de rotation soit documentée.
+  '''sxnc ieny uguy ucnw''',
+  '''cvkcvuyfjnbjeyzj''',
+
+  # Espaces réservés
+  '''A_DEFINIR(_VARIABLE_ENVIRONNEMENT)?''',
+]

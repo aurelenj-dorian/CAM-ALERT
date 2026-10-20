@@ -1,0 +1,134 @@
+name: CI
+
+# Compile le projet, exécute les tests et vérifie qu'aucun secret n'est
+# introduit. Le projet cible le .NET Framework 4.8 : il faut un agent Windows
+# et MSBuild, « dotnet build » ne sait pas le compiler.
+
+on:
+  push:
+    branches: [main, 'claude/**']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-et-tests:
+    name: Compilation et tests (${{ matrix.configuration }})
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Installer MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Installer NuGet
+        uses: NuGet/setup-nuget@v2
+
+      - name: Mettre en cache les paquets NuGet
+        uses: actions/cache@v4
+        with:
+          path: packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/packages.config') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      # On restaure chaque packages.config dans le dossier packages partagé
+      # plutôt que de passer par la solution : le format .slnx n'est pas
+      # compris par toutes les versions de NuGet et de MSBuild.
+      - name: Restaurer les paquets
+        run: |
+          nuget restore packages.config -PackagesDirectory packages
+          nuget restore CamAlert.Tests\packages.config -PackagesDirectory packages
+
+      # Construire le projet de tests entraîne la construction du projet web,
+      # qui est référencé.
+      - name: Compiler
+        run: >
+          msbuild CamAlert.Tests\CamAlert.Tests.csproj
+          /p:Configuration=${{ matrix.configuration }}
+          /p:Platform="AnyCPU"
+          /verbosity:minimal
+          /nologo
+
+      # vstest.console.exe est fourni par Visual Studio, déjà présent sur
+      # l'agent Windows : on le localise avec vswhere plutôt que d'ajouter une
+      # action tierce.
+      - name: Localiser vstest.console.exe
+        id: vstest
+        shell: pwsh
+        run: |
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $chemin = & $vswhere -latest -products * `
+                      -requires Microsoft.VisualStudio.PackageGroup.TestTools.Core `
+                      -find "Common7\IDE\Extensions\TestPlatform\vstest.console.exe" |
+                    Select-Object -First 1
+          if (-not $chemin) { throw "vstest.console.exe introuvable sur l'agent." }
+          "chemin=$chemin" >> $env:GITHUB_OUTPUT
+
+      - name: Exécuter les tests
+        shell: pwsh
+        run: |
+          & "${{ steps.vstest.outputs.chemin }}" `
+            "CamAlert.Tests\bin\${{ matrix.configuration }}\CamAlert.Tests.dll" `
+            /Logger:trx /ResultsDirectory:TestResults
+
+      - name: Publier les résultats de tests
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: resultats-tests-${{ matrix.configuration }}
+          path: TestResults/
+          if-no-files-found: ignore
+
+  secrets:
+    name: Recherche de secrets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le code (historique complet)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_ENABLE_UPLOAD_ARTIFACT: false
+
+      - name: Vérifier l'absence de secrets réintroduits
+        shell: bash
+        run: |
+          # Garde-fou explicite : les mots de passe d'application Gmail publiés
+          # dans l'historique de ce dépôt et de SOCADEL.DUERP.Web ne doivent
+          # jamais réapparaître dans l'arbre de travail.
+          motif='sxnc ieny uguy ucnw|cvkcvuyfjnbjeyzj'
+          if git grep -nIE "$motif" -- . ':!*.yml' ':!SECURITY.md' ':!Helpers/Parametres.cs' ':!.gitleaks.toml'; then
+            echo "::error::Un secret connu comme divulgué est présent dans le code."
+            exit 1
+          fi
+
+          # SMTP_Password doit rester un espace réservé dans Web.config
+          if ! grep -q 'key="SMTP_Password" value="A_DEFINIR_VARIABLE_ENVIRONNEMENT"' Web.config; then
+            echo "::error file=Web.config::SMTP_Password doit rester l'espace réservé A_DEFINIR_VARIABLE_ENVIRONNEMENT ; le secret réel se définit par variable d'environnement (voir SECURITY.md)."
+            exit 1
+          fi
+
+          # Pas d'identifiants dans un appel direct au SMTP
+          if git grep -nIE 'new NetworkCredential\("[^"]+", *"[^"]+"\)' -- '*.cs'; then
+            echo "::error::Identifiants SMTP écrits en dur ; passez par Helpers/Parametres.cs."
+            exit 1
+          fi
+
+          echo "Aucun secret connu détecté."

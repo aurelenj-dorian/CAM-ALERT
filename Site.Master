@@ -7,6 +7,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CAM-ALERT – Portail camerounais</title>
 
+    <meta name="description" content="CAM-ALERT : portail camerounais de recherche des personnes disparues et recherchées. Consultez les dossiers publiés et transmettez une information aux agents habilités." />
+    <meta name="theme-color" content="#003f7d" />
+    <meta name="color-scheme" content="light dark" />
+
+    <!-- Partage sur les réseaux sociaux et les messageries : sans ces
+         métadonnées, un lien partagé n'affiche qu'une URL brute, ce qui
+         réduit la diffusion d'un avis de recherche. -->
+    <meta property="og:site_name" content="CAM-ALERT" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="fr_CM" />
+    <meta property="og:title" content="CAM-ALERT – Portail camerounais" />
+    <meta property="og:description" content="Personnes disparues et recherchées au Cameroun. Consultez les dossiers publiés et transmettez une information." />
+    <meta property="og:image" content="/Content/images/icone-512.png" />
+    <meta name="twitter:card" content="summary" />
+
+    <!-- Installation comme application et icônes -->
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/Content/images/icone-32.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/Content/images/icone-192.png" />
+    <link rel="apple-touch-icon" href="/Content/images/icone-192.png" />
+
     <link rel="stylesheet" type="text/css" href="/Content/css/style.css" />
     <link rel="stylesheet" type="text/css" href="/Content/css/design.css" />
     <link rel="stylesheet" type="text/css" href="/Content/css/dark-mode.css" />
@@ -415,6 +436,23 @@
                 });
             }
         })();
+    </script>
+
+    <!-- Service worker : le portail est consulté depuis le Cameroun, souvent
+         sur réseau mobile intermittent. Il met en cache la feuille de style et
+         les pages déjà visitées, et affiche une page dédiée plutôt que
+         l'erreur du navigateur quand la connexion est coupée.
+         Voir /sw.js pour les stratégies de cache et ce qui en est exclu. -->
+    <script>
+        if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('/sw.js').catch(function () {
+                    // Enregistrement impossible (HTTP simple, navigateur ancien,
+                    // mode navigation privée) : le site fonctionne normalement,
+                    // simplement sans cache hors ligne.
+                });
+            });
+        }
     </script>
 </body>
 </html>

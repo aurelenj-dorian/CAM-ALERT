@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Hors ligne – CAM-ALERT</title>
+    <link rel="stylesheet" type="text/css" href="/Content/css/style.css" />
+    <style>
+        /* Styles repris en ligne : si la feuille principale n'est pas encore
+           en cache, cette page doit rester lisible. */
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6fb;
+               margin: 0; color: #333; }
+        .bloc { max-width: 520px; margin: 72px auto; padding: 44px;
+                background: #fff; border-radius: 12px; text-align: center;
+                box-shadow: 0 8px 28px rgba(0,0,0,.1); }
+        .bloc h1 { color: #003f7d; font-size: 1.5rem; margin: 0 0 12px; }
+        .bloc p { color: #666; line-height: 1.6; }
+        .bouton { display: inline-block; margin-top: 20px; padding: 12px 24px;
+                  background: #003f7d; color: #fff; border: 0; border-radius: 8px;
+                  font-size: 15px; cursor: pointer; text-decoration: none; }
+        .astuce { margin-top: 28px; font-size: 13px; color: #888; }
+    </style>
+</head>
+<body>
+    <div class="bloc">
+        <div style="font-size:46px;line-height:1;">&#128246;</div>
+        <h1>Vous êtes hors ligne</h1>
+        <p>
+            Cette page n'a pas encore été consultée, elle n'est donc pas
+            disponible sans réseau. Les pages déjà ouvertes restent accessibles.
+        </p>
+        <button class="bouton" onclick="location.reload()">Réessayer</button>
+        <p class="astuce">
+            Les avis de recherche sont volontairement rechargés depuis le
+            réseau : un dossier peut être clos ou retiré, et CAM-ALERT ne doit
+            pas afficher une version périmée.
+        </p>
+    </div>
+
+    <script>
+        // Rechargement automatique dès que la connexion revient.
+        window.addEventListener('online', function () { location.reload(); });
+    </script>
+</body>
+</html>

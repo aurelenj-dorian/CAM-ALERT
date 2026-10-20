@@ -25,6 +25,12 @@
             </div>
         </asp:Panel>
 
+        <!-- Message d'erreur -->
+        <asp:Panel ID="pnlErreur" runat="server" Visible="false"
+            CssClass="error-msg" role="alert">
+            <asp:Label ID="lblErreur" runat="server" />
+        </asp:Panel>
+
         <!-- Formulaire -->
         <asp:Panel ID="pnlForm" runat="server">
 

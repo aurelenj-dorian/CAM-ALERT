@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Plan du site des pages statiques de CAM-ALERT.
+
+  Les fiches de dossier (/DossierDetail.aspx?id=…) ne figurent pas ici : leur
+  liste change à chaque publication, et un plan statique serait aussitôt
+  périmé. Elles sont découvertes par les moteurs depuis /Dossiers.aspx.
+  Pour les déclarer explicitement, générer ce fichier depuis la base
+  (SELECT DossierID, DateModification FROM Dossiers WHERE EstPublie = 1).
+
+  Les URL sont relatives au domaine de publication : remplacer
+  https://exemple.cm par le domaine réel avant la mise en ligne.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://exemple.cm/Default.aspx</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://exemple.cm/Dossiers.aspx</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://exemple.cm/Historique.aspx</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://exemple.cm/Apropos.aspx</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+</urlset>

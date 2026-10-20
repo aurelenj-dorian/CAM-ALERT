@@ -1,0 +1,34 @@
+# CAM-ALERT — règles d'exploration
+#
+# Les dossiers publiés doivent être trouvables : c'est leur raison d'être.
+# Le reste ne doit pas être indexé.
+
+User-agent: *
+
+# Espace d'administration
+Disallow: /Admin/
+
+# Pièces jointes des signalements et photos de dossiers : les fichiers
+# eux-mêmes ne doivent pas apparaître dans les moteurs de recherche,
+# indépendamment des fiches qui les affichent.
+Disallow: /Uploads/
+
+# Pages techniques
+Disallow: /sante
+Disallow: /Erreur.aspx
+Disallow: /Introuvable.aspx
+Disallow: /hors-ligne.html
+
+# Formulaires : rien à indexer, et leur exploration répétée déclencherait
+# la limitation de tentatives.
+Disallow: /Signalement.aspx
+Disallow: /Contact.aspx
+
+# Contenu public
+Allow: /Default.aspx
+Allow: /Dossiers.aspx
+Allow: /DossierDetail.aspx
+Allow: /Historique.aspx
+Allow: /Apropos.aspx
+
+Sitemap: /sitemap.xml

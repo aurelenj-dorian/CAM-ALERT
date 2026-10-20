@@ -19,10 +19,12 @@
     </div>
 
     <!-- MESSAGE -->
-    <asp:Panel ID="pnlMessage" runat="server" Visible="false">
-        <div class="success-msg">
-            <asp:Literal ID="litMessage" runat="server" />
-        </div>
+    <%-- La classe CSS est posée par le code-behind : le même panneau sert
+         pour une confirmation (success-msg) et pour un refus (error-msg).
+         Il était figé sur « success-msg », si bien qu'un message d'erreur
+         s'affichait dans un bandeau vert. --%>
+    <asp:Panel ID="pnlMessage" runat="server" Visible="false" CssClass="success-msg">
+        <asp:Literal ID="litMessage" runat="server" />
     </asp:Panel>
 
     <!-- DETAIL SIGNALEMENT -->

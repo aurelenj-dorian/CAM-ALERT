@@ -91,18 +91,20 @@
             EmptyDataText="Aucun signalement traité pour l'instant.">
             <Columns>
                 <asp:BoundField DataField="DossierTitre" HeaderText="Dossier concerné" />
-                <asp:BoundField DataField="NomDeclarant" HeaderText="Déclarant" />
-                <asp:TemplateField HeaderText="Message">
-                    <ItemTemplate>
-                        <%# Eval("Message").ToString().Length > 60 ?
-                            Eval("Message").ToString().Substring(0, 60) + "..." :
-                            Eval("Message") %>
-                    </ItemTemplate>
-                </asp:TemplateField>
+                <%-- Le nom du déclarant et le contenu du signalement ne sont
+                     plus publiés : cette page est publique, et un témoin peut
+                     être identifié par son nom comme par ce qu'il raconte. --%>
                 <asp:BoundField DataField="StatutLibelle" HeaderText="Statut" />
-                <asp:TemplateField HeaderText="Date">
+                <asp:TemplateField HeaderText="Reçu le">
                     <ItemTemplate>
                         <%# Convert.ToDateTime(Eval("DateSoumission")).ToString("dd/MM/yyyy") %>
+                    </ItemTemplate>
+                </asp:TemplateField>
+                <asp:TemplateField HeaderText="Traité le">
+                    <ItemTemplate>
+                        <%# Eval("DateTraitement") == null || Eval("DateTraitement") == System.DBNull.Value
+                            ? "—"
+                            : Convert.ToDateTime(Eval("DateTraitement")).ToString("dd/MM/yyyy") %>
                     </ItemTemplate>
                 </asp:TemplateField>
             </Columns>

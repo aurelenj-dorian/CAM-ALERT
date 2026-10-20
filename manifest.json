@@ -1,0 +1,46 @@
+{
+  "name": "CAM-ALERT — Portail camerounais des personnes disparues et recherchées",
+  "short_name": "CAM-ALERT",
+  "description": "Consultez les dossiers de personnes disparues ou recherchées au Cameroun et transmettez une information aux agents habilités.",
+  "lang": "fr",
+  "dir": "ltr",
+  "start_url": "/Default.aspx",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#003f7d",
+  "categories": ["news", "government", "utilities"],
+  "icons": [
+    {
+      "src": "/Content/images/icone-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/Content/images/icone-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/Content/images/icone-512-masquable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Consulter les dossiers",
+      "short_name": "Dossiers",
+      "url": "/Dossiers.aspx"
+    },
+    {
+      "name": "Transmettre une information",
+      "short_name": "Signaler",
+      "url": "/Signalement.aspx"
+    }
+  ]
+}

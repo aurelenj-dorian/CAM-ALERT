@@ -77,6 +77,18 @@
     <Content Include="Admin\image\téléchargement %287%29.jpg" />
     <Content Include="Admin\image\téléchargement.jpg" />
     <Content Include="Admin\Login.aspx" />
+    <Content Include="Admin\MotDePasse.aspx" />
+    <Content Include="Erreur.aspx" />
+    <Content Include="Introuvable.aspx" />
+    <Content Include="hors-ligne.html" />
+    <Content Include="manifest.json" />
+    <Content Include="sw.js" />
+    <Content Include="robots.txt" />
+    <Content Include="sitemap.xml" />
+    <Content Include="Content\images\icone-32.png" />
+    <Content Include="Content\images\icone-192.png" />
+    <Content Include="Content\images\icone-512.png" />
+    <Content Include="Content\images\icone-512-masquable.png" />
     <Content Include="Admin\Signalements.aspx" />
     <Content Include="Apropos.aspx" />
     <Content Include="Carte.aspx" />
@@ -122,6 +134,13 @@
     </Compile>
     <Compile Include="Admin\Login.aspx.designer.cs">
       <DependentUpon>Login.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\MotDePasse.aspx.cs">
+      <DependentUpon>MotDePasse.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\MotDePasse.aspx.designer.cs">
+      <DependentUpon>MotDePasse.aspx</DependentUpon>
     </Compile>
     <Compile Include="Admin\Signalements.aspx.cs">
       <DependentUpon>Signalements.aspx</DependentUpon>
@@ -176,6 +195,18 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\Database.cs" />
+    <Compile Include="Helpers\FichierSecurise.cs" />
+    <Compile Include="Helpers\HacheurMotDePasse.cs" />
+    <Compile Include="Helpers\JetonSession.cs" />
+    <Compile Include="Helpers\Journal.cs" />
+    <Compile Include="Helpers\LimiteurTentatives.cs" />
+    <Compile Include="Helpers\Parametres.cs" />
+    <Compile Include="Helpers\PolitiqueMotDePasse.cs" />
+    <Compile Include="Helpers\RechercheSql.cs" />
+    <Compile Include="Helpers\UrlLocale.cs" />
+    <Compile Include="Handlers\SanteHandler.cs" />
+    <Compile Include="PageBase.cs" />
+    <Compile Include="PageAdmin.cs" />
     <Compile Include="Historique.aspx.cs">
       <DependentUpon>Historique.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -201,6 +232,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Database\01_Schema.sql" />
+    <None Include="Database\02_DonneesReference.sql" />
+    <None Include="Database\03_Procedures.sql" />
+    <None Include="Database\04_Migration_Securite.sql" />
+    <None Include="Database\README.md" />
     <Content Include="Site.Master" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
