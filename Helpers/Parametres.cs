@@ -118,13 +118,29 @@ namespace CamAlert.Helpers
         }
 
         /// <summary>
-        /// Chaîne de connexion : variable d'environnement d'abord,
-        /// section connectionStrings ensuite.
+        /// Chaîne de connexion, par ordre de priorité :
+        ///   1. variable d'environnement <c>CAMALERT_CONNECTIONSTRING_&lt;nom&gt;</c> ;
+        ///   2. clé <c>appSettings</c> nommée <c>ConnectionString_&lt;nom&gt;</c>,
+        ///      qui peut vivre dans secrets.config, non versionné ;
+        ///   3. section <c>connectionStrings</c> de Web.config.
+        ///
+        /// Le deuxième niveau existe pour les hébergements mutualisés, où l'on
+        /// n'a pas la main sur les variables d'environnement de la machine. On
+        /// ne peut pas y utiliser <c>configSource</c> sur la section
+        /// connectionStrings : cet attribut est strict, un fichier absent fait
+        /// échouer le démarrage du site. Le passage par appSettings, lui,
+        /// tolère l'absence du fichier externe.
+        ///
+        /// En production, la chaîne contient le mot de passe du compte SQL :
+        /// elle n'a pas sa place dans Web.config, qui est versionné.
         /// </summary>
         public static string ChaineConnexion(string nom)
         {
             var valeur = LireEnvironnement(PREFIXE_ENV + "CONNECTIONSTRING_" + nom);
             if (!string.IsNullOrWhiteSpace(valeur)) return valeur.Trim();
+
+            valeur = Lire("ConnectionString_" + nom);
+            if (!string.IsNullOrWhiteSpace(valeur)) return valeur;
 
             var reglage = ConfigurationManager.ConnectionStrings[nom];
             return reglage == null ? null : reglage.ConnectionString;

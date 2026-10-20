@@ -22,6 +22,7 @@ dossiers et traitent les signalements reçus.
 - [Fonctionnement hors ligne](#fonctionnement-hors-ligne)
 - [Tests](#tests)
 - [Exploitation](#exploitation)
+- [Déploiement](#déploiement)
 - [Sécurité](#sécurité)
 
 ---
@@ -84,8 +85,12 @@ versionné dans un dépôt public. Les valeurs sensibles sont lues par
 `Helpers/Parametres.cs`, qui consulte d'abord les variables d'environnement
 du serveur, puis `appSettings`.
 
+Deux moyens, selon ce à quoi vous avez accès sur le serveur.
+
+### Serveur dont vous maîtrisez l'environnement
+
 ```powershell
-# Sur le serveur, en administrateur (/M = portée machine)
+# En administrateur (/M = portée machine)
 setx CAMALERT_SMTP_USER             "contact@exemple.cm"                 /M
 setx CAMALERT_SMTP_PASSWORD         "<mot de passe d'application>"       /M
 setx CAMALERT_SMTP_FROM             "contact@exemple.cm"                 /M
@@ -93,6 +98,27 @@ setx CAMALERT_CONTACT_DESTINATAIRES "agent1@exemple.cm;agent2@exemple.cm" /M
 setx CAMALERT_CONNECTIONSTRING_CamAlertDB "Server=.;Database=CamAlert;Integrated Security=True;" /M
 # Puis redémarrer le pool d'applications IIS pour qu'il relise l'environnement.
 ```
+
+C'est la méthode à privilégier : aucun secret ne touche le disque du site.
+
+### Hébergement mutualisé (pas de ligne de commande)
+
+Recopiez `secrets.config.example` en **`secrets.config`**, renseignez les vraies
+valeurs, et déposez-le par FTP à la racine du site, à côté de `Web.config`.
+
+`Web.config` déclare `<appSettings file="secrets.config">` : les clés du fichier
+externe écrasent celles du fichier versionné. L'attribut `file=` est tolérant —
+si `secrets.config` est absent, ASP.NET l'ignore sans erreur, et le poste de
+développement fonctionne sans configuration supplémentaire.
+
+`secrets.config` est exclu de Git, et l'intégration continue échoue s'il y est
+ajouté par mégarde.
+
+La chaîne de connexion peut y figurer sous la clé `ConnectionString_CamAlertDB` :
+en production elle contient le mot de passe du compte SQL, elle n'a donc pas sa
+place dans `Web.config`.
+
+La procédure complète de mise en ligne est dans **[DEPLOIEMENT.md](DEPLOIEMENT.md)**.
 
 | Clé | Rôle | Défaut |
 |---|---|---|
@@ -226,6 +252,17 @@ d'intégration continue compile et exécute la suite sans base.
   HSTS. N'activez HSTS qu'une fois le certificat en place.
 
 ---
+
+## Déploiement
+
+La mise en ligne sur un hébergement mutualisé est décrite pas à pas dans
+**[DEPLOIEMENT.md](DEPLOIEMENT.md)** : migration de la base **avant** le code,
+dépôt de `secrets.config`, publication en Release, vérifications, et triage des
+erreurs `500.19` dues aux sections de configuration verrouillées par
+l'hébergeur.
+
+L'ordre compte : la nouvelle version attend des colonnes qui n'existent pas
+encore dans une base antérieure.
 
 ## Sécurité
 

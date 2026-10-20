@@ -131,4 +131,11 @@ jobs:
             exit 1
           fi
 
+          # secrets.config contient les vraies valeurs et ne doit jamais
+          # être versionné : il se dépose à la main sur le serveur.
+          if git ls-files | grep -qE '(^|/)secrets\.config$'; then
+            echo "::error::secrets.config est versionné. Il contient les secrets de production et doit rester hors du dépôt (voir .gitignore et secrets.config.example)."
+            exit 1
+          fi
+
           echo "Aucun secret connu détecté."

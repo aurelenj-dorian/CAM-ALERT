@@ -49,7 +49,15 @@ Values the C# code compares literally — renaming them in the database breaks t
 - `Statuts.Libelle = 'Traité'` (`Historique`)
 - `Roles.Libelle = 'Administrateur'` (`Site.Master`, `PageAdmin`, `Carte`)
 
-Connection string `CamAlertDB` lives in `Web.config`. **Secrets never go in `Web.config`** — this repo is public. `Helpers/Parametres.cs` reads `CAMALERT_*` environment variables first (`CAMALERT_SMTP_PASSWORD`, `CAMALERT_CONNECTIONSTRING_CamAlertDB`, …) and falls back to `appSettings`. It also refuses the Gmail app password that was committed to this repo's history.
+Connection string `CamAlertDB` lives in `Web.config`. **Secrets never go in `Web.config`** — this repo is public. `Helpers/Parametres.cs` resolves in this order: `CAMALERT_*` environment variable → `appSettings` key → (for connection strings) the `connectionStrings` section.
+
+`Web.config` declares `<appSettings file="secrets.config">`. `secrets.config` is **gitignored** and hand-deployed to the server — the escape hatch for shared hosting where you cannot set machine environment variables. `file=` is tolerant of a missing file, unlike `configSource`, so a dev machine needs no extra setup. Template: `secrets.config.example`. CI fails if `secrets.config` is ever committed.
+
+In production the connection string carries the SQL account password, so it belongs in `secrets.config` under the key `ConnectionString_CamAlertDB`.
+
+`Parametres` also refuses the Gmail app password that was committed to this repo's history.
+
+**This site is deployed** (see `Link of the Web App`). `DEPLOIEMENT.md` is the release procedure for shared hosting: run `Database/04_Migration_Securite.sql` **before** publishing the code — the current code expects columns an older database does not have — then `03_Procedures.sql`, then drop `secrets.config` by FTP, publish in Release, and check `/sante`. It also lists which `Web.config` sections to strip if the host returns `500.19`.
 
 ## Architecture
 

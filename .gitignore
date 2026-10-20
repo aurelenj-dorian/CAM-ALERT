@@ -430,3 +430,7 @@ Uploads/*
 # d'execution, pas des ressources du projet.
 Admin/image/6*_*.jpg
 Admin/image/6*_*.png
+
+# Secrets de deploiement : depose a la main sur le serveur, jamais versionne.
+# Modele : secrets.config.example
+secrets.config

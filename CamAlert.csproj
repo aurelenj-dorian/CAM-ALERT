@@ -232,6 +232,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="secrets.config.example" />
     <None Include="Database\01_Schema.sql" />
     <None Include="Database\02_DonneesReference.sql" />
     <None Include="Database\03_Procedures.sql" />

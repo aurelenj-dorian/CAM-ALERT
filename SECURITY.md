@@ -33,17 +33,30 @@ les personnes concernées qu'elles peuvent recevoir du courrier indésirable.
 1. Ouvrir https://myaccount.google.com/apppasswords et **supprimer** le mot de
    passe d'application concerné. Toute copie publiée devient alors inutilisable.
 2. Générer un nouveau mot de passe d'application, dédié à cette application.
-3. Le déposer **uniquement** dans une variable d'environnement du serveur :
+3. Le déposer **hors du dépôt**, par l'un des deux moyens :
 
-   ```powershell
-   setx CAMALERT_SMTP_PASSWORD "<nouveau mot de passe>" /M
-   setx CAMALERT_SMTP_USER     "contact@exemple.cm"     /M
-   ```
+   - serveur dont vous maîtrisez l'environnement :
 
-   Puis redémarrer le pool d'applications IIS.
+     ```powershell
+     setx CAMALERT_SMTP_PASSWORD "<nouveau mot de passe>" /M
+     setx CAMALERT_SMTP_USER     "contact@exemple.cm"     /M
+     ```
+
+     puis redémarrer le pool d'applications IIS ;
+
+   - hébergement mutualisé : recopier `secrets.config.example` en
+     `secrets.config`, y mettre la valeur, et déposer le fichier par FTP à la
+     racine du site. Il est exclu de Git, et l'intégration continue échoue s'il
+     y est ajouté par mégarde.
+
 4. Vérifier que `Web.config` contient bien l'espace réservé
    `A_DEFINIR_VARIABLE_ENVIRONNEMENT` et aucune valeur réelle.
 5. Contrôler l'effet : `GET /sante` doit renvoyer `"smtp":"configure"`.
+
+La chaîne de connexion suit le même chemin : en production elle contient le mot
+de passe du compte SQL, et n'a donc pas sa place dans `Web.config`. Clé
+`ConnectionString_CamAlertDB` dans `secrets.config`, ou variable
+`CAMALERT_CONNECTIONSTRING_CamAlertDB`.
 
 `Helpers/Parametres.cs` connaît les valeurs divulguées et **refuse** de les
 utiliser : si l'ancienne reste configurée, l'envoi échoue avec un message
