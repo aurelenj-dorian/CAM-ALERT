@@ -197,7 +197,8 @@ namespace CamAlert.Admin
         }
 
         private void ModifierDossier(int dossierID, int typeID, int regionID,
-                                     int? annee, int publie, string imageUrl)
+                                     int? annee, int publie, string imageUrl,
+                                     string statut)
         {
             // L'image n'est remplacée que si un nouveau fichier a été fourni :
             // modifier un dossier sans toucher à la photo doit la conserver.

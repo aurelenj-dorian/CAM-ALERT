@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Web;
 using System.Web.UI;
 using CamAlert.Helpers;
@@ -51,7 +51,17 @@ namespace CamAlert
 
             // Doit être affecté dans Init : plus tard, le ViewState est déjà
             // en cours de désérialisation et la clé serait ignorée.
-            ViewStateUserKey = Session.SessionID;
+            try
+            {
+                if (Session != null)
+                    ViewStateUserKey = Session.SessionID;
+            }
+            catch (HttpException)
+            {
+                // L'état de session n'est pas disponible sur cette requête :
+                // la page s'affiche sans la protection liée à la session
+                // plutôt que de renvoyer une erreur.
+            }
 
             base.OnInit(e);
         }
