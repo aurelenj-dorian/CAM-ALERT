@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <!-- .NET 9 : compatible avec Visual Studio 2022 (.NET 10 exige Visual Studio 2026) -->
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Le front-end React est construit par Vite, pas par MSBuild -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);ClientApp\**</DefaultItemExcludes>
+    <UserSecretsId>camalert-web-2c7e1f4a</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.1.89" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="7.1.1" />
+    <!-- Remplace la version vulnérable (9.0.18) tirée par Microsoft.Data.SqlClient -->
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.22" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Pièces jointes privées : jamais publiées avec l'application -->
+    <Content Remove="App_Data\**" />
+    <None Include="App_Data\uploads\.gitkeep" />
+  </ItemGroup>
+
+  <!-- À la publication : construction du front-end React dans wwwroot/app -->
+  <Target Name="ConstruireClientApp" BeforeTargets="ComputeFilesToPublish">
+    <Exec WorkingDirectory="ClientApp" Command="npm ci" />
+    <Exec WorkingDirectory="ClientApp" Command="npm run build" />
+    <ItemGroup>
+      <FichiersClient Include="wwwroot\app\**" />
+      <ResolvedFileToPublish Include="@(FichiersClient->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
+        <RelativePath>%(FichiersClient.Identity)</RelativePath>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </ResolvedFileToPublish>
+    </ItemGroup>
+  </Target>
+
+</Project>

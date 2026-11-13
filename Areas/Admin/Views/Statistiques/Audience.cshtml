@@ -1,0 +1,62 @@
+@model StatistiquesAudience
+@{
+    ViewData["Title"] = "Audience";
+}
+<div class="titre-page">
+    <div>
+        <h1>Audience</h1>
+        <p class="texte-secondaire">30 derniers jours — visiteurs ayant accepté la mesure d'audience uniquement.</p>
+    </div>
+</div>
+
+@if (!Model.Active)
+{
+    <div class="alerte alerte-info" role="status">
+        La mesure d'audience est inactive : la table <code>PagesVues</code> n'existe pas.
+        Exécutez le script <code>Database/AjoutAudience.sql</code>.
+    </div>
+}
+else
+{
+    <div class="grille-chiffres">
+        <div class="chiffre carte"><span class="chiffre-valeur">@Model.PagesVues</span><span>pages vues</span></div>
+        <div class="chiffre carte"><span class="chiffre-valeur">@Model.Visiteurs</span><span>visiteurs uniques</span></div>
+    </div>
+
+    <div class="grille-2">
+        <section class="carte">
+            <h2>Pages vues par jour</h2>
+            @if (Model.ParJour.Count == 0)
+            {
+                <p class="etat-vide">Pas encore de données.</p>
+            }
+            else
+            {
+                <div class="zone-graphique">
+                    <canvas id="graphique-audience" role="img" aria-label="Pages vues par jour"
+                            data-libelles="@System.Text.Json.JsonSerializer.Serialize(Model.ParJour.Select(x => x.Libelle))"
+                            data-valeurs="@System.Text.Json.JsonSerializer.Serialize(Model.ParJour.Select(x => x.Valeur))"></canvas>
+                </div>
+            }
+        </section>
+        <section class="carte">
+            <h2>Pages les plus vues</h2>
+            @if (Model.PagesPopulaires.Count == 0)
+            {
+                <p class="etat-vide">Pas encore de données.</p>
+            }
+            else
+            {
+                <table class="tableau">
+                    <thead><tr><th scope="col">Page</th><th scope="col" class="nombre">Vues</th></tr></thead>
+                    <tbody>
+                        @foreach (var p in Model.PagesPopulaires)
+                        {
+                            <tr><td class="mono">@p.Libelle</td><td class="nombre">@p.Valeur</td></tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </section>
+    </div>
+}

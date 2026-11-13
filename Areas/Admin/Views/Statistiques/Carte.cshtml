@@ -1,0 +1,15 @@
+@{
+    ViewData["Title"] = "Carte";
+}
+<div class="titre-page">
+    <div>
+        <h1>Carte des dossiers</h1>
+        <p class="texte-secondaire">Dossiers publiés géolocalisés. Cliquez sur un marqueur pour voir le détail.</p>
+    </div>
+    <ul class="legende" aria-label="Légende">
+        <li><span class="pastille pastille-disparition" aria-hidden="true"></span>Disparition</li>
+        <li><span class="pastille pastille-recherche" aria-hidden="true"></span>Recherche judiciaire</li>
+    </ul>
+</div>
+
+<div id="carte" class="carte-leaflet" data-carte="/admin/carte/donnees" aria-label="Carte du Cameroun"></div>

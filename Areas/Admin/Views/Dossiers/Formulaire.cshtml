@@ -1,0 +1,87 @@
+@model DossierFormulaire
+@{
+    bool nouveau = Model.Id == 0;
+    ViewData["Title"] = nouveau ? "Nouveau dossier" : "Modifier le dossier";
+    string action = nouveau ? "/admin/dossiers/nouveau" : $"/admin/dossiers/{Model.Id}/modifier";
+}
+<div class="titre-page">
+    <h1>@ViewData["Title"]</h1>
+    <a href="/admin/dossiers" class="lien-discret">← Retour à la liste</a>
+</div>
+
+<form method="post" action="@action" enctype="multipart/form-data" asp-antiforgery="true" class="formulaire carte" novalidate>
+    <div asp-validation-summary="ModelOnly" class="alerte alerte-erreur" role="alert"></div>
+
+    <div class="grille-2">
+        <div class="champ">
+            <label asp-for="Titre"></label>
+            <input asp-for="Titre" />
+            <span asp-validation-for="Titre" class="erreur-champ"></span>
+        </div>
+        <div class="champ">
+            <label asp-for="TypeId"></label>
+            <select asp-for="TypeId" asp-items="@(new SelectList(Model.Types, "Id", "Libelle"))">
+                <option value="">— Choisir —</option>
+            </select>
+            <span asp-validation-for="TypeId" class="erreur-champ"></span>
+        </div>
+        <div class="champ">
+            <label asp-for="RegionId"></label>
+            <select asp-for="RegionId" asp-items="@(new SelectList(Model.Regions, "Id", "Libelle"))">
+                <option value="">— Choisir —</option>
+            </select>
+            <span asp-validation-for="RegionId" class="erreur-champ"></span>
+        </div>
+        <div class="champ">
+            <label asp-for="Ville"></label>
+            <input asp-for="Ville" />
+            <span asp-validation-for="Ville" class="erreur-champ"></span>
+        </div>
+        <div class="champ">
+            <label asp-for="Annee"></label>
+            <input asp-for="Annee" type="number" min="1900" max="2100" inputmode="numeric" />
+            <span asp-validation-for="Annee" class="erreur-champ"></span>
+        </div>
+        <div class="champ">
+            <label asp-for="Statut"></label>
+            <select asp-for="Statut" asp-items="@(new SelectList(DossierFormulaire.Statuts))"></select>
+            <span asp-validation-for="Statut" class="erreur-champ"></span>
+        </div>
+    </div>
+
+    <div class="champ champ-case">
+        <input asp-for="EstPublie" />
+        <label asp-for="EstPublie"></label>
+    </div>
+
+    <div class="champ">
+        <label asp-for="CommentaireResolution"></label>
+        <input asp-for="CommentaireResolution" placeholder="Ex. : personne retrouvée saine et sauve le…" />
+    </div>
+
+    <div class="champ">
+        <label asp-for="Description"></label>
+        <textarea asp-for="Description" rows="5"></textarea>
+    </div>
+
+    <div class="champ">
+        <label asp-for="SignesDistinctifs"></label>
+        <textarea asp-for="SignesDistinctifs" rows="3"></textarea>
+    </div>
+
+    <div class="champ">
+        <label asp-for="Image"></label>
+        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+        {
+            <img src="@Model.ImageUrl" alt="Photo actuelle" class="apercu-image" width="120" height="150" />
+            <p class="aide">Laisser vide pour conserver la photo actuelle.</p>
+        }
+        <input asp-for="Image" type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" />
+        <span asp-validation-for="Image" class="erreur-champ"></span>
+    </div>
+
+    <div class="actions-formulaire">
+        <button type="submit" class="bouton bouton-primaire">Enregistrer</button>
+        <a href="/admin/dossiers" class="bouton bouton-secondaire">Annuler</a>
+    </div>
+</form>

@@ -1,0 +1,63 @@
+@model SignalementDetailModele
+@{
+    var s = Model.Signalement;
+    ViewData["Title"] = $"Signalement n°{s.Id}";
+}
+<div class="titre-page">
+    <h1>Signalement n°@s.Id</h1>
+    <a href="/admin/signalements" class="lien-discret">← Retour à la liste</a>
+</div>
+
+<div class="grille-detail">
+    <section class="carte">
+        <dl class="meta">
+            <div><dt>Dossier</dt><dd>@s.Dossier</dd></div>
+            <div><dt>Déclarant</dt><dd>@(string.IsNullOrWhiteSpace(s.NomDeclarant) ? "Anonyme" : s.NomDeclarant)</dd></div>
+            <div><dt>E-mail</dt><dd>@(string.IsNullOrWhiteSpace(s.Email) ? "Non renseigné" : s.Email)</dd></div>
+            <div><dt>Date</dt><dd>@s.DateSoumission?.ToString("dd/MM/yyyy HH:mm")</dd></div>
+            <div><dt>Statut</dt><dd><span class="statut statut-@s.StatutId">@s.Statut</span></dd></div>
+        </dl>
+
+        <h2>Message</h2>
+        @* Encodé par Razor : un message contenant du HTML s'affiche comme du texte *@
+        <p class="message-signalement">@s.Message</p>
+
+        @if (!string.IsNullOrEmpty(s.FichierJoint))
+        {
+            <h2>Pièce jointe</h2>
+            @if (Model.PieceJointeDisponible)
+            {
+                <a href="/admin/signalements/@s.Id/piece-jointe" class="bouton bouton-secondaire">Télécharger la pièce jointe</a>
+            }
+            else
+            {
+                <p class="texte-secondaire">Fichier introuvable sur le serveur.</p>
+            }
+        }
+    </section>
+
+    <aside class="pile">
+        <form method="post" action="/admin/signalements/@s.Id/statut" asp-antiforgery="true" class="carte">
+            <h2>Changer le statut</h2>
+            <div class="champ">
+                <label for="statutId">Statut</label>
+                <select id="statutId" name="statutId">
+                    @foreach (var st in Model.Statuts)
+                    {
+                        <option value="@st.Id" selected="@(st.Id == s.StatutId)">@st.Libelle</option>
+                    }
+                </select>
+            </div>
+            <button type="submit" class="bouton bouton-primaire">Mettre à jour</button>
+        </form>
+
+        <form method="post" action="/admin/signalements/@s.Id/commentaire" asp-antiforgery="true" class="carte">
+            <h2>Commentaire interne</h2>
+            <div class="champ">
+                <label for="commentaire">Visible uniquement par les agents</label>
+                <textarea id="commentaire" name="commentaire" rows="5">@s.CommentaireInterne</textarea>
+            </div>
+            <button type="submit" class="bouton bouton-secondaire">Enregistrer le commentaire</button>
+        </form>
+    </aside>
+</div>

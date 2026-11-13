@@ -1,0 +1,53 @@
+@{
+    var connecte = User.Identity?.IsAuthenticated == true;
+    var chemin = Context.Request.Path.Value ?? "";
+    string Actif(string prefixe) => chemin.StartsWith(prefixe, StringComparison.OrdinalIgnoreCase) ? "actif" : "";
+}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>@ViewData["Title"] · Administration CAM-ALERT</title>
+    <link rel="stylesheet" href="~/app/assets/admin.css" asp-append-version="true" />
+    <script type="module" src="~/app/assets/admin.js" asp-append-version="true"></script>
+</head>
+<body class="admin">
+    <a class="lien-evitement" href="#contenu">Aller au contenu</a>
+    <header class="admin-entete">
+        <div class="admin-entete-interne">
+            <a class="marque" href="/admin/dossiers">
+                <span class="marque-signal" aria-hidden="true"></span>
+                CAM-ALERT <span class="marque-sous">Administration</span>
+            </a>
+            @if (connecte)
+            {
+                <nav class="admin-nav" aria-label="Administration">
+                    <a class="@Actif("/admin/dossiers")" href="/admin/dossiers">Dossiers</a>
+                    <a class="@Actif("/admin/signalements")" href="/admin/signalements">Signalements</a>
+                    <a class="@Actif("/admin/graphiques")" href="/admin/graphiques">Graphiques</a>
+                    <a class="@Actif("/admin/carte")" href="/admin/carte">Carte</a>
+                    <a class="@Actif("/admin/audience")" href="/admin/audience">Audience</a>
+                </nav>
+                <div class="admin-compte">
+                    <a href="/" class="lien-discret">Voir le site</a>
+                    <form method="post" action="/admin/deconnexion" asp-antiforgery="true">
+                        <button type="submit" class="bouton bouton-secondaire bouton-petit">
+                            Se déconnecter (@User.Identity!.Name)
+                        </button>
+                    </form>
+                </div>
+            }
+        </div>
+    </header>
+
+    <main id="contenu" class="admin-contenu" tabindex="-1">
+        @if (TempData["Message"] is string message)
+        {
+            <div class="alerte alerte-succes" role="status">@message</div>
+        }
+        @RenderBody()
+    </main>
+</body>
+</html>

@@ -1,0 +1,20 @@
+@{
+    ViewData["Title"] = "Graphiques";
+}
+<div class="titre-page">
+    <div>
+        <h1>Graphiques</h1>
+        <p class="texte-secondaire">Signalements reçus par mois et par région.</p>
+    </div>
+</div>
+
+<div class="grille-2" data-graphiques="/admin/graphiques/donnees">
+    <section class="carte">
+        <h2>Signalements par mois</h2>
+        <div class="zone-graphique"><canvas id="graphique-mois" role="img" aria-label="Signalements par mois sur les 12 derniers mois"></canvas></div>
+    </section>
+    <section class="carte">
+        <h2>Signalements par région</h2>
+        <div class="zone-graphique"><canvas id="graphique-region" role="img" aria-label="Signalements par région"></canvas></div>
+    </section>
+</div>

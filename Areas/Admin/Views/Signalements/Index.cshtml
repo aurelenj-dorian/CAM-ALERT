@@ -1,0 +1,46 @@
+@model IReadOnlyList<SignalementAdmin>
+@{
+    ViewData["Title"] = "Signalements";
+    static string Extrait(string texte) => texte.Length > 80 ? texte[..80] + "…" : texte;
+}
+<div class="titre-page">
+    <div>
+        <h1>Signalements</h1>
+        <p class="texte-secondaire">@Model.Count signalement(s), du plus récent au plus ancien.</p>
+    </div>
+</div>
+
+@if (Model.Count == 0)
+{
+    <p class="etat-vide">Aucun signalement.</p>
+}
+else
+{
+    <div class="tableau-defilant">
+        <table class="tableau">
+            <thead>
+                <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Dossier</th>
+                    <th scope="col">Déclarant</th>
+                    <th scope="col">Message</th>
+                    <th scope="col">Statut</th>
+                    <th scope="col"><span class="visuellement-cache">Actions</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var s in Model)
+                {
+                    <tr>
+                        <td class="sans-retour">@s.DateSoumission?.ToString("dd/MM/yyyy")</td>
+                        <td>@s.Dossier</td>
+                        <td>@(string.IsNullOrWhiteSpace(s.NomDeclarant) ? "Anonyme" : s.NomDeclarant)</td>
+                        <td>@Extrait(s.Message)</td>
+                        <td><span class="statut statut-@s.StatutId">@s.Statut</span></td>
+                        <td><a href="/admin/signalements/@s.Id" class="bouton bouton-secondaire bouton-petit">Voir</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

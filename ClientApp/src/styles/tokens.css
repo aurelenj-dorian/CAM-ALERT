@@ -1,0 +1,124 @@
+/* =========================================================
+   CAM-ALERT — Design tokens (clair / sombre)
+   Toutes les paires texte/fond respectent un contraste ≥ 4.5:1
+   ========================================================= */
+
+:root {
+  color-scheme: light;
+
+  /* Couleurs */
+  --fond: #F6F7F9;
+  --surface: #FFFFFF;
+  --surface-2: #EEF1F4;
+  --texte: #14181F;
+  --texte-2: #4A5363;
+  --bordure: #DDE1E7;
+  --bordure-forte: #B9C0CA;
+
+  --primaire: #0F4C45;
+  --primaire-survol: #0B3A35;
+  --sur-primaire: #FFFFFF;
+  --primaire-doux: #E3F0EE;
+
+  --accent: #D97706;           /* décoratif uniquement (signal) */
+
+  --disparition: #B45309;
+  --disparition-fond: #FEF3C7;
+  --recherche: #B42318;
+  --recherche-fond: #FEE4E2;
+
+  --succes: #067647;
+  --succes-fond: #DCFAE6;
+  --erreur: #B42318;
+  --erreur-fond: #FEE4E2;
+  --info: #1D4ED8;
+  --info-fond: #DBEAFE;
+
+  --focus: #1D4ED8;
+
+  /* Typographie */
+  --police: 'Public Sans Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --police-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  --taille-base: 1rem;
+  --interligne: 1.5;
+
+  /* Espacements (échelle 4px) */
+  --esp-1: 0.25rem;
+  --esp-2: 0.5rem;
+  --esp-3: 0.75rem;
+  --esp-4: 1rem;
+  --esp-5: 1.5rem;
+  --esp-6: 2rem;
+  --esp-7: 3rem;
+  --esp-8: 4rem;
+
+  /* Formes */
+  --rayon: 10px;
+  --rayon-petit: 6px;
+  --ombre: 0 1px 2px rgb(16 24 40 / 0.06), 0 1px 3px rgb(16 24 40 / 0.08);
+  --ombre-haute: 0 12px 32px rgb(16 24 40 / 0.14);
+
+  --largeur-max: 1200px;
+  --transition: 160ms ease-out;
+}
+
+/* Sombre : préférence système (sauf choix « clair »), ou choix explicite « sombre » */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='clair']) {
+    color-scheme: dark;
+    --fond: #0E1116;
+    --surface: #171B22;
+    --surface-2: #1F242D;
+    --texte: #E8EAEE;
+    --texte-2: #A3ABB8;
+    --bordure: #2A303A;
+    --bordure-forte: #3D4552;
+    --primaire: #5FB3A7;
+    --primaire-survol: #7CC6BB;
+    --sur-primaire: #0E1116;
+    --primaire-doux: #16302D;
+    --accent: #F59E0B;
+    --disparition: #FBBF24;
+    --disparition-fond: #3A2E10;
+    --recherche: #FCA5A5;
+    --recherche-fond: #3D1A1A;
+    --succes: #6CE9A6;
+    --succes-fond: #0F2E20;
+    --erreur: #FCA5A5;
+    --erreur-fond: #3D1A1A;
+    --info: #93C5FD;
+    --info-fond: #172A46;
+    --focus: #93C5FD;
+    --ombre: 0 1px 2px rgb(0 0 0 / 0.4);
+    --ombre-haute: 0 12px 32px rgb(0 0 0 / 0.5);
+  }
+}
+
+:root[data-theme='sombre'] {
+  color-scheme: dark;
+  --fond: #0E1116;
+  --surface: #171B22;
+  --surface-2: #1F242D;
+  --texte: #E8EAEE;
+  --texte-2: #A3ABB8;
+  --bordure: #2A303A;
+  --bordure-forte: #3D4552;
+  --primaire: #5FB3A7;
+  --primaire-survol: #7CC6BB;
+  --sur-primaire: #0E1116;
+  --primaire-doux: #16302D;
+  --accent: #F59E0B;
+  --disparition: #FBBF24;
+  --disparition-fond: #3A2E10;
+  --recherche: #FCA5A5;
+  --recherche-fond: #3D1A1A;
+  --succes: #6CE9A6;
+  --succes-fond: #0F2E20;
+  --erreur: #FCA5A5;
+  --erreur-fond: #3D1A1A;
+  --info: #93C5FD;
+  --info-fond: #172A46;
+  --focus: #93C5FD;
+  --ombre: 0 1px 2px rgb(0 0 0 / 0.4);
+  --ombre-haute: 0 12px 32px rgb(0 0 0 / 0.5);
+}

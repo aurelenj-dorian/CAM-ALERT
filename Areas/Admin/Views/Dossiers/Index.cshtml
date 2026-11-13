@@ -1,0 +1,56 @@
+@model IReadOnlyList<DossierAdmin>
+@{
+    ViewData["Title"] = "Dossiers";
+}
+<div class="titre-page">
+    <div>
+        <h1>Dossiers</h1>
+        <p class="texte-secondaire">@Model.Count dossier(s) au total.</p>
+    </div>
+    <a href="/admin/dossiers/nouveau" class="bouton bouton-primaire">Nouveau dossier</a>
+</div>
+
+@if (Model.Count == 0)
+{
+    <p class="etat-vide">Aucun dossier.</p>
+}
+else
+{
+    <div class="tableau-defilant">
+        <table class="tableau">
+            <thead>
+                <tr>
+                    <th scope="col">Réf.</th>
+                    <th scope="col">Titre</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Région</th>
+                    <th scope="col">Année</th>
+                    <th scope="col">Statut</th>
+                    <th scope="col">Publié</th>
+                    <th scope="col"><span class="visuellement-cache">Actions</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var d in Model)
+                {
+                    <tr>
+                        <td><span class="reference">@d.Reference</span></td>
+                        <td>@d.Titre</td>
+                        <td><span class="badge @(d.TypeId == 1 ? "badge-disparition" : "badge-recherche")">@d.Type</span></td>
+                        <td>@d.Region</td>
+                        <td>@d.Annee</td>
+                        <td>@(d.Statut ?? "En cours")</td>
+                        <td>@(d.EstPublie == true ? "Oui" : "Non")</td>
+                        <td class="actions">
+                            <a href="/admin/dossiers/@d.Id/modifier" class="bouton bouton-secondaire bouton-petit">Modifier</a>
+                            <form method="post" action="/admin/dossiers/@d.Id/supprimer" asp-antiforgery="true"
+                                  data-confirmer="Supprimer le dossier « @d.Titre » et ses signalements ? Cette action est définitive.">
+                                <button type="submit" class="bouton bouton-danger bouton-petit">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

@@ -1,0 +1,46 @@
+@model ConnexionModele
+@{
+    ViewData["Title"] = "Connexion";
+}
+<section class="carte-connexion">
+    <h1>Espace administration</h1>
+    <p class="texte-secondaire">Accès réservé aux agents habilités.</p>
+
+    <form method="post" action="/admin/connexion" asp-antiforgery="true" novalidate>
+        <div asp-validation-summary="ModelOnly" class="alerte alerte-erreur" role="alert"></div>
+        <input type="hidden" asp-for="ReturnUrl" />
+
+        <div class="champ">
+            <label asp-for="Login"></label>
+            <input asp-for="Login" autocomplete="username" autofocus />
+            <span asp-validation-for="Login" class="erreur-champ"></span>
+        </div>
+
+        <div class="champ">
+            <label asp-for="MotDePasse"></label>
+            <div class="champ-mot-de-passe">
+                <input asp-for="MotDePasse" autocomplete="current-password" />
+                @* Bouton géré par admin.js (aucun script en ligne) *@
+                <button type="button" class="bouton-oeil" data-afficher-mdp="MotDePasse"
+                        aria-controls="MotDePasse" aria-pressed="false" aria-label="Afficher le mot de passe">
+                    <svg class="icone-oeil" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.88 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.88 0" />
+                        <circle cx="12" cy="12" r="3" />
+                    </svg>
+                    <svg class="icone-oeil-barre" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c4.84 0 8.62 3.03 9.94 6.65a1 1 0 0 1 0 .7 10.75 10.75 0 0 1-1.44 2.49" />
+                        <path d="M14.08 14.16a3 3 0 0 1-4.24-4.24" />
+                        <path d="M17.48 17.5a10.75 10.75 0 0 1-15.42-5.15 1 1 0 0 1 0-.7 10.75 10.75 0 0 1 4.45-5.14" />
+                        <path d="m2 2 20 20" />
+                    </svg>
+                </button>
+            </div>
+            <span asp-validation-for="MotDePasse" class="erreur-champ"></span>
+        </div>
+
+        <button type="submit" class="bouton bouton-primaire bouton-large">Se connecter</button>
+    </form>
+    <p><a href="/" class="lien-discret">← Retour au site public</a></p>
+</section>
